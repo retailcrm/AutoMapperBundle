@@ -1,28 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Retailcrm\AutoMapperBundle\Mapper\FieldAccessor;
 
 /**
- * Closure access a member value using a closure.
+ * ClosureFilter access a member value using a closure.
  *
  * @author Michel Salib <michelsalib@hotmail.com>
  */
 class Closure implements FieldAccessorInterface
 {
-    /**
-     * @var \Closure
-     */
-    private $closure;
-
-    /**
-     * @param $closure The closure
-     */
-    public function __construct(\Closure $closure)
+    public function __construct(private \Closure $closure)
     {
         $this->closure = $closure;
     }
 
-    public function getValue($source)
+    public function getValue(mixed $source): mixed
     {
         $closure = $this->closure;
 

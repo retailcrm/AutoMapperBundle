@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Retailcrm\AutoMapperBundle\Mapper\FieldFilter;
 
 /**
@@ -11,10 +13,6 @@ interface FieldFilterInterface
 {
     /**
      * Applies the filter to a given value.
-     *
-     * @param $value mixed The value to filter
-     *
-     * @return mixed The filtered value
      */
-    public function filter($value);
+    public function filter(mixed $value): mixed;
 }

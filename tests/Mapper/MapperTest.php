@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Retailcrm\AutoMapperBundle\Tests\Mapper;
 
 use PHPUnit\Framework\TestCase;
@@ -50,7 +52,7 @@ class MapperTest extends TestCase
         $destination = new DestinationPost();
         $mapper = new Mapper();
         $mapper->createMap('Retailcrm\AutoMapperBundle\Tests\Fixtures\SourcePost', 'Retailcrm\AutoMapperBundle\Tests\Fixtures\DestinationPost')
-               ->route('title', 'name')
+            ->route('title', 'name')
         ;
 
         // ACT
@@ -70,7 +72,7 @@ class MapperTest extends TestCase
         $destination = new DestinationPost();
         $mapper = new Mapper();
         $mapper->createMap('Retailcrm\AutoMapperBundle\Tests\Fixtures\SourcePost', 'Retailcrm\AutoMapperBundle\Tests\Fixtures\DestinationPost')
-               ->route('author', 'author.name')
+            ->route('author', 'author.name')
         ;
 
         // ACT
@@ -89,9 +91,9 @@ class MapperTest extends TestCase
         $destination = new DestinationPost();
         $mapper = new Mapper();
         $mapper->createMap('Retailcrm\AutoMapperBundle\Tests\Fixtures\SourcePost', 'Retailcrm\AutoMapperBundle\Tests\Fixtures\DestinationPost')
-               ->forMember('author', new Closure(function (SourcePost $s) {
-                   return $s->author->name;
-               }))
+            ->forMember('author', new Closure(function (SourcePost $s) {
+                return $s->author->name;
+            }))
         ;
 
         // ACT
@@ -127,7 +129,7 @@ class MapperTest extends TestCase
         $destination = new DestinationPost();
         $mapper = new Mapper();
         $mapper->createMap('Retailcrm\AutoMapperBundle\Tests\Fixtures\SourcePost', 'Retailcrm\AutoMapperBundle\Tests\Fixtures\DestinationPost')
-               ->filter('title', new IfNull(''))
+            ->filter('title', new IfNull(''))
         ;
 
         // ACT
@@ -159,7 +161,9 @@ class MapperTest extends TestCase
         $source->description = 'Symfony2 developer';
         $destination = new PrivateDestinationPost();
         $mapper = new Mapper();
-        $mapper->createMap('Retailcrm\AutoMapperBundle\Tests\Fixtures\SourcePost', 'Retailcrm\AutoMapperBundle\Tests\Fixtures\PrivateDestinationPost')
+        $mapper
+            ->createMap('Retailcrm\AutoMapperBundle\Tests\Fixtures\SourcePost', 'Retailcrm\AutoMapperBundle\Tests\Fixtures\PrivateDestinationPost')
+            ->setSkipNonExists(true)
             ->ignoreMember('id')
         ;
 
@@ -220,7 +224,7 @@ class MapperTest extends TestCase
         $destination->description = 'Foo bar';
         $mapper = new Mapper();
         $mapper->createMap('Retailcrm\AutoMapperBundle\Tests\Fixtures\SourcePost', 'Retailcrm\AutoMapperBundle\Tests\Fixtures\DestinationPost')
-               ->setSkipNull(true)
+            ->setSkipNull(true)
         ;
 
         try {

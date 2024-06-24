@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Retailcrm\AutoMapperBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -15,11 +17,13 @@ class MapPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        if ($container->hasDefinition('auto_mapper.mapper')) {
-            $definition = $container->getDefinition('auto_mapper.mapper');
-            foreach ($container->findTaggedServiceIds('auto_mapper.map') as $id => $attributes) {
-                $definition->addMethodCall('registerMap', [new Reference($id)]);
-            }
+        if (!$container->hasDefinition('auto_mapper.mapper')) {
+            return;
+        }
+
+        $definition = $container->getDefinition('auto_mapper.mapper');
+        foreach ($container->findTaggedServiceIds('auto_mapper.map') as $id => $attributes) {
+            $definition->addMethodCall('registerMap', [new Reference($id)]);
         }
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Retailcrm\AutoMapperBundle\Mapper\FieldAccessor;
 
 /**
@@ -9,17 +11,13 @@ namespace Retailcrm\AutoMapperBundle\Mapper\FieldAccessor;
  */
 class Constant implements FieldAccessorInterface
 {
-    private $value;
-
-    /**
-     * @param $value The constant
-     */
-    public function __construct($value)
-    {
+    public function __construct(
+        private mixed $value
+    ) {
         $this->value = $value;
     }
 
-    public function getValue($source)
+    public function getValue(mixed $source): mixed
     {
         return $this->value;
     }

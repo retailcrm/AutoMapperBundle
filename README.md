@@ -1,31 +1,14 @@
 # AutoMapper
 
-### Goals of this fork
-
 `github.com/retailcrm/AutoMapperBundle` is a fork of `github.com/michelsalib/BCCAutoMapperBundle`
 
 ## Installation and configuration:
 
 ### Get the bundle
 
-Add to your `composer.json` file :
-
 ```
-"require": {
-    ...
-    "bcc/automapper-bundle": "dev-master"
-}
-
-"repositories": [
-    ...
-    {
-        "type": "vcs",
-        "url": "https://github.com/retailcrm/AutoMapperBundle "
-    }
-]
+composer install retailcrm/auto-mapper-bundle
 ```
-
-And make a `php bin/vendors install`.
 
 ### Add AutoMapperBundle to your application kernel
 
@@ -352,12 +335,14 @@ class PostMap extends AbstractMap {
 }
 ```
 
-Don't forget to declare it as a service with the `auto_mapper.map` tag:
+You can register all maps that implements `MapInterface`  with the `auto_mapper.map` tag:
 
-``` xml
-<service id="my.map" class="My\PostMap">
-    <tag name="auto_mapper.map" />
-</service>
+``` yml 
+// services.yml
+
+_instanceof:
+    Retailcrm\AutoMapperBundle\Mapper\MapInterface:
+        tags: ['auto_mapper.map']
 ```
 
 You can now use the mapper directly:

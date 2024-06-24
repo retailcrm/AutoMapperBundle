@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Retailcrm\AutoMapperBundle\Mapper\FieldAccessor;
 
 use Retailcrm\AutoMapperBundle\Mapper\Exception\InvalidSourceProperty;
+use Symfony\Component\ExpressionLanguage\Expression as SymfonyExpression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
  * Simple returns a value for a member given a property path.
@@ -15,20 +17,20 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  */
 class Expression implements FieldAccessorInterface
 {
-    /**
-     * @var PropertyPath
-     */
-    private $sourcePropertyPath;
+    private SymfonyExpression $sourcePropertyPath;
 
-    /**
-     * @param string|\Symfony\Component\ExpressionLanguage\Expression $sourcePropertyPath The property path
-     */
-    public function __construct($sourcePropertyPath)
+    public function __construct(string|SymfonyExpression $sourcePropertyPath)
     {
-        $this->sourcePropertyPath = $sourcePropertyPath;
+        if ($sourcePropertyPath instanceof SymfonyExpression) {
+            $this->sourcePropertyPath = $sourcePropertyPath;
+
+            return;
+        }
+
+        $this->sourcePropertyPath = new SymfonyExpression($sourcePropertyPath);
     }
 
-    public function getValue($source)
+    public function getValue(mixed $source): mixed
     {
         $expLanguage = new ExpressionLanguage();
         try {
@@ -46,5 +48,7 @@ class Expression implements FieldAccessorInterface
                 throw $ex;
             }
         }
+
+        return null;
     }
 }

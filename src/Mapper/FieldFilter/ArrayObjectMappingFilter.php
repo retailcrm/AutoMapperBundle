@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Retailcrm\AutoMapperBundle\Mapper\FieldFilter;
 
 use Doctrine\Common\Collections\Collection;
@@ -12,25 +14,25 @@ use Doctrine\Common\Collections\Collection;
 class ArrayObjectMappingFilter extends AbstractMappingFilter
 {
     /**
-     * Applies the filter to a given value.
+     * Applies the filter to a given value
      *
-     * @param $value mixed The value to filter
-     *
-     * @return mixed The filtered value
+     * @return array<?object>
      */
-    public function filter($value)
+    public function filter(mixed $value): array
     {
         if ($value instanceof Collection) {
             $value = $value->toArray();
         }
 
-        if (is_array($value)) {
-            $objectFilter = new ObjectMappingFilter($this->className);
-            $objectFilter->setMapper($this->getMapper());
-
-            return array_map(function ($item) use ($objectFilter) {
-                return $objectFilter->filter($item);
-            }, $value);
+        if (!is_array($value)) {
+            return [];
         }
+
+        $objectFilter = new ObjectMappingFilter($this->className);
+        $objectFilter->setMapper($this->getMapper());
+
+        return array_map(function ($item) use ($objectFilter) {
+            return $objectFilter->filter($item);
+        }, $value);
     }
 }

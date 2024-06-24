@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Retailcrm\AutoMapperBundle\Tests\Fixtures;
 
 /**
@@ -7,67 +9,40 @@ namespace Retailcrm\AutoMapperBundle\Tests\Fixtures;
  */
 class PrivateSourcePost
 {
-    /** @var string */
-    private $name;
-    /** @var string */
-    private $description;
-    /** @var SourceAuthor */
-    private $author;
-    /** @var SourceComment[] */
-    private $comments;
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
+    /** @param SourceComment[] $comments */
+    public function __construct(
+        private ?int $id = null,
+        private ?string $title = null,
+        private ?string $description = null,
+        private ?string $author = null,
+        private ?array $comments = null
+    ) {
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name): void
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    /**
-     * @param string $description
-     */
-    public function setDescription($description): void
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
 
-    /**
-     * @return SourceAuthor
-     */
-    public function getAuthor()
+    public function getAuthor(): mixed
     {
         return $this->author;
     }
 
-    /**
-     * @param SourceAuthor $author
-     */
-    public function setAuthor($author): void
+    public function setAuthor(mixed $author): void
     {
         $this->author = $author;
     }
 
     /**
-     * @return SourceComment[]
+     * @return ?SourceComment[]
      */
-    public function getComments()
+    public function getComments(): ?array
     {
         return $this->comments;
     }
@@ -75,8 +50,28 @@ class PrivateSourcePost
     /**
      * @param SourceComment[] $comments
      */
-    public function setComments($comments): void
+    public function setComments(array $comments): void
     {
         $this->comments = $comments;
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function setId(?int $id): void
+    {
+        $this->id = $id;
+    }
+
+    public function setTitle(?string $title): void
+    {
+        $this->title = $title;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
     }
 }
