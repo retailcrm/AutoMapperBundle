@@ -1,28 +1,36 @@
 {
-    "name": "bcc/auto-mapper-bundle",
+    "name": "retailcrm/auto-mapper-bundle",
     "type": "symfony-bundle",
-    "description": "An object to object mapper bundle for Symfony2",
+    "description": "An object to object mapper bundle for Symfony",
     "license": "MIT",
     "keywords": ["mapper automapper"],
-    "homepage": "http://github.com/michelsalib/BCCAutoMapperBundle",
+    "homepage": "https://github.com/retailcrm/AutoMapperBundle",
     "authors": [
         {
-            "name": "Michel Salib",
-            "email": "michelsalib@hotmail.com",
-            "homepage": "http://www.michelsalib.com"
+            "name": "RetailCRM",
+            "email": "support@retailcrm.ru",
+            "homepage": "https://www.retailcrm.ru/"
         }
     ],
     "require": {
-        "php": ">=5.3.2",
-        "symfony/framework-bundle": ">=2.2.0 || ^3.0",
-        "symfony/property-access": ">=2.2.0 || ^3.0",
-        "symfony/expression-language": ">=2.2.0 || ^3.0"
+        "php": ">=8.1",
+        "symfony/framework-bundle": "^5.4||^6.0||^7.0",
+        "symfony/property-access": "^5.4||^6.0||^7.0",
+        "symfony/expression-language": "^5.4||^6.0||^7.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "4.7.*"
+        "phpunit/phpunit": "^10.0",
+        "retailcrm/php-code-style": "^1.0",
+        "friendsofphp/php-cs-fixer": "^3.56"
     },
     "autoload": {
-        "psr-0": { "BCC\\AutoMapperBundle": "" }
+        "psr-4": {
+            "Retailcrm\\AutoMapperBundle\\": "src"
+        }
     },
-    "target-dir": "BCC/AutoMapperBundle"
+    "autoload-dev": {
+        "psr-4": {
+            "Retailcrm\\AutoMapperBundle\\Tests\\": "tests"
+        }
+    }
 }
