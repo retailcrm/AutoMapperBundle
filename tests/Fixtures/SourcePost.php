@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Retailcrm\AutoMapperBundle\Tests\Fixtures;
 
 /**
@@ -7,8 +9,27 @@ namespace Retailcrm\AutoMapperBundle\Tests\Fixtures;
  */
 class SourcePost
 {
-    public $name;
-    public $description;
-    public $author;
-    public $comments;
+    /** @param SourceComment[] $comments */
+    public function __construct(
+        public ?string $name = null,
+        public ?string $description = null,
+        public mixed $author = null,
+        public ?array $comments = null,
+    ) {
+    }
+
+    public static function default(): self
+    {
+        $comments = [];
+        for ($i = 0; $i < 5; ++$i) {
+            $comments[] = new SourceComment('Comment content' . $i);
+        }
+
+        return new self(
+            'Comment name',
+            'Comment description',
+            SourceAuthor::default(),
+            $comments
+        );
+    }
 }

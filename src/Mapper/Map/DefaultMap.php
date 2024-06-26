@@ -1,59 +1,51 @@
 <?php
 
-namespace Retailcrm\AutoMapperBundle\Mapper;
+declare(strict_types=1);
+
+namespace Retailcrm\AutoMapperBundle\Mapper\Map;
 
 use Retailcrm\AutoMapperBundle\Mapper\FieldAccessor\Simple;
 
 /**
- * DefaultMap is an auto genrated map.
+ * DefaultMap is an auto generated map.
  *
  * @author Michel Salib <michelsalib@hotmail.com>
  */
 class DefaultMap extends AbstractMap
 {
-    private $sourceType;
-    private $destinationType;
-
     /**
      * Creates a default map given the source and destination types.
      *
-     * @param string $sourceType
-     * @param string $destinationMap
+     * @param class-string $destinationType
      */
-    public function __construct($sourceType, $destinationMap)
-    {
-        $this->sourceType = $sourceType;
-        $this->destinationType = $destinationMap;
-
+    public function __construct(
+        private string $sourceType,
+        private string $destinationType
+    ) {
         $this->buildDefaultMap();
-    }
-
-    public function getSourceType()
-    {
-        return $this->fieldAccessors;
     }
 
     /**
      * Associate a member to another member given their property pathes.
-     *
-     * @param string $destinationMember
-     * @param string $sourceMember
-     *
-     * @return AbstractMap
      */
-    public function route($destinationMember, $sourceMember)
+    public function route(string $destinationMember, string $sourceMember): self
     {
         $this->fieldAccessors[$destinationMember] = new Simple($this->getCorrectPropertyPath($sourceMember));
 
         return $this;
     }
 
-    public function getDestinationType()
+    public function getSourceType(): string
+    {
+        return $this->sourceType;
+    }
+
+    public function getDestinationType(): string
     {
         return $this->destinationType;
     }
 
-    public function buildDefaultMap()
+    public function buildDefaultMap(): self
     {
         $reflectionClass = new \ReflectionClass($this->getDestinationType());
 
@@ -64,7 +56,7 @@ class DefaultMap extends AbstractMap
         return $this;
     }
 
-    private function getCorrectPropertyPath($name)
+    private function getCorrectPropertyPath(string $name): string
     {
         return 'array' == $this->sourceType ? '[' . $name . ']' : $name;
     }

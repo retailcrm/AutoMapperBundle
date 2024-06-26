@@ -16,4 +16,7 @@ phpunit: $(PHP_CONSOLE_DEPS)
 php-cs: $(PHP_CONSOLE_DEPS)
 	@$(PHP) vendor/bin/php-cs-fixer check -vv
 
-check: php-cs phpunit
+phpstan: $(PHP_CONSOLE_DEPS)
+	@$(PHP) vendor/bin/phpstan analyse
+
+check: php-cs phpstan phpunit

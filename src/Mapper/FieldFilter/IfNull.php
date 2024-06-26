@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Retailcrm\AutoMapperBundle\Mapper\FieldFilter;
 
 /**
@@ -9,20 +11,14 @@ namespace Retailcrm\AutoMapperBundle\Mapper\FieldFilter;
  */
 class IfNull implements FieldFilterInterface
 {
-    private $value;
-
-    /**
-     * @param mixed $value The value
-     */
-    public function __construct($value)
+    public function __construct(private mixed $value)
     {
-        $this->value = $value;
     }
 
     /**
      * Returns a default value if the original is null
      */
-    public function filter($value)
+    public function filter(mixed $value): mixed
     {
         return $value ?: $this->value;
     }

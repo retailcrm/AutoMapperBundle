@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Retailcrm\AutoMapperBundle\Tests\Mapper\FieldAccessor;
 
 use PHPUnit\Framework\TestCase;

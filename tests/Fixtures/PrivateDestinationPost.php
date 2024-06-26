@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Retailcrm\AutoMapperBundle\Tests\Fixtures;
 
 /**
@@ -7,42 +9,50 @@ namespace Retailcrm\AutoMapperBundle\Tests\Fixtures;
  */
 class PrivateDestinationPost
 {
-    private $id;
-    private $title;
-    private $description;
-    private $author;
+    public function __construct(
+        private ?int $id = null,
+        private ?string $title = null,
+        private ?string $description = null,
+        private ?string $author = null
+    ) {
+    }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setAuthor($author): void
+    public function setId(?int $id): void
+    {
+        $this->id = $id;
+    }
+
+    public function setAuthor(mixed $author): void
     {
         $this->author = $author;
     }
 
-    public function getAuthor()
+    public function getAuthor(): ?string
     {
         return $this->author;
     }
 
-    public function setDescription($description): void
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
 
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setTitle($title): void
+    public function setTitle(string $title): void
     {
         $this->title = $title;
     }
 
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->title;
     }

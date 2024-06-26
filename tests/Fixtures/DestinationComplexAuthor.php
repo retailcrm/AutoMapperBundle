@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Retailcrm\AutoMapperBundle\Tests\Fixtures;
 
 class DestinationComplexAuthor
 {
-    private $name;
-
     /**
      * DestinationComplexAuthor constructor.
      */
-    public function __construct($name)
+    public function __construct(private string $name)
     {
-        $this->name = $name;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
     }
 }

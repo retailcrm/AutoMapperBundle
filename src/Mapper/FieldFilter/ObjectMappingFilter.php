@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Retailcrm\AutoMapperBundle\Mapper\FieldFilter;
 
 /**
@@ -11,15 +13,13 @@ class ObjectMappingFilter extends AbstractMappingFilter
 {
     /**
      * Applies the filter to a given value.
-     *
-     * @param $value mixed The value to filter
-     *
-     * @return mixed The filtered value
      */
-    public function filter($value)
+    public function filter(mixed $value): ?object
     {
-        if ($value) {
-            return $this->getMapper()->map($value, $this->className);
+        if (!$value) {
+            return null;
         }
+
+        return $this->getMapper()->map($value, $this->className);
     }
 }

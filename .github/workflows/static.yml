@@ -1,7 +1,26 @@
 name: Static analysis
-on: [push, pull_request]
+on: pull_request
 
 jobs:
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+
+      - name: Update project dependencies
+        run: composer update --no-progress --ansi --prefer-stable
+
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse
+
   php-cs-fixer:
     name: PHP-CS-Fixer
     runs-on: ubuntu-22.04
@@ -17,9 +36,6 @@ jobs:
 
       - name: Update project dependencies
         run: composer update --no-progress --ansi --prefer-stable
-
-      - name: Validate composer
-        run: composer validate --strict --no-check-lock
 
       - name: PHP-CS-Fixer
         run: vendor/bin/php-cs-fixer check -vv
