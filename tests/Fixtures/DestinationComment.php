@@ -7,7 +7,7 @@ namespace Retailcrm\AutoMapperBundle\Tests\Fixtures;
 class DestinationComment
 {
     public function __construct(
-        public ?string $content = null
+        public ?string $content = null,
     ) {
     }
 

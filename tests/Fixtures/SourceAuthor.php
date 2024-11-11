@@ -10,7 +10,7 @@ namespace Retailcrm\AutoMapperBundle\Tests\Fixtures;
 class SourceAuthor
 {
     public function __construct(
-        public ?string $name = null
+        public ?string $name = null,
     ) {
     }
 

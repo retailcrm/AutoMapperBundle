@@ -13,7 +13,7 @@ class EntityCollectionMappingFilter extends AbstractMappingFilter
     public function __construct(
         string $className,
         protected EntityManagerInterface $em,
-        protected bool $canExistsEntity = false
+        protected bool $canExistsEntity = false,
     ) {
         parent::__construct($className);
     }

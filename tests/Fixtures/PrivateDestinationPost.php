@@ -13,7 +13,7 @@ class PrivateDestinationPost
         private ?int $id = null,
         private ?string $title = null,
         private ?string $description = null,
-        private ?string $author = null
+        private ?string $author = null,
     ) {
     }
 

@@ -19,7 +19,7 @@ class Relationship implements FieldAccessorInterface
         private Mapper $mapper,
         private string $parentClass,
         private string $class,
-        private string $field
+        private string $field,
     ) {
     }
 
