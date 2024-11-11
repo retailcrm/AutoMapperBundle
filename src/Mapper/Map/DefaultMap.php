@@ -20,7 +20,7 @@ class DefaultMap extends AbstractMap
      */
     public function __construct(
         private string $sourceType,
-        private string $destinationType
+        private string $destinationType,
     ) {
         $this->buildDefaultMap();
     }

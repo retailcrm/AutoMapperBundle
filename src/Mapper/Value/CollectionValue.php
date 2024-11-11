@@ -12,7 +12,7 @@ class CollectionValue implements MapperValueInterface
     public function __construct(
         protected mixed $value,
         protected array $deletedItems,
-        protected bool $canExistsEntity = false
+        protected bool $canExistsEntity = false,
     ) {
     }
 

@@ -15,7 +15,7 @@ class PrivateSourcePost
         private ?string $title = null,
         private ?string $description = null,
         private ?string $author = null,
-        private ?array $comments = null
+        private ?array $comments = null,
     ) {
     }
 

@@ -14,7 +14,7 @@ class EntityFilter implements FieldFilterInterface
      */
     public function __construct(
         protected string $className,
-        protected EntityManagerInterface $em
+        protected EntityManagerInterface $em,
     ) {
     }
 

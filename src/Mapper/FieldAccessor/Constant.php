@@ -12,7 +12,7 @@ namespace Retailcrm\AutoMapperBundle\Mapper\FieldAccessor;
 class Constant implements FieldAccessorInterface
 {
     public function __construct(
-        private mixed $value
+        private mixed $value,
     ) {
         $this->value = $value;
     }
