@@ -14,6 +14,7 @@ class EntityCollectionMappingFilter extends AbstractMappingFilter
         string $className,
         protected EntityManagerInterface $em,
         protected bool $canExistsEntity = false,
+        private ?\Closure $classBuilder = null,
     ) {
         parent::__construct($className);
     }
@@ -37,14 +38,21 @@ class EntityCollectionMappingFilter extends AbstractMappingFilter
 
         $removedIds = [];
         foreach ($value as $key => $item) {
-            if (isset($item['id'], $item['deleted']) && $item['deleted']) {
+            if (is_array($item) && isset($item['id'], $item['deleted']) && $item['deleted']) {
                 $removedIds[] = (int) $item['id'];
+                unset($value[$key]);
+            }
+            if (is_object($item)
+                && property_exists($item, 'id') && $item->id
+                && property_exists($item, 'deleted') && $item->deleted
+            ) {
+                $removedIds[] = (int) $item->id;
                 unset($value[$key]);
             }
         }
         unset($item);
 
-        $objectFilter = new EntityMappingFilter($this->className, $this->em);
+        $objectFilter = new EntityMappingFilter($this->className, $this->em, $this->classBuilder);
         $objectFilter->setMapper($this->getMapper());
 
         $values = array_map(fn ($item) => $objectFilter->filter($item), $value);
