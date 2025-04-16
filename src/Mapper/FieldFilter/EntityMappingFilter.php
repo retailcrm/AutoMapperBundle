@@ -14,6 +14,7 @@ class EntityMappingFilter extends AbstractMappingFilter
     public function __construct(
         string $className,
         protected EntityManagerInterface $em,
+        private ?\Closure $classBuilder = null,
     ) {
         parent::__construct($className);
     }
@@ -27,6 +28,10 @@ class EntityMappingFilter extends AbstractMappingFilter
         $entity = null;
         if (isset($value['id'])) {
             $entity = $this->em->getRepository($this->className)->find($value['id']);
+        }
+
+        if (!$entity && null !== $this->classBuilder) {
+            $entity = $this->classBuilder->call($this, $value);
         }
 
         return $this->getMapper()->map($value, $entity ?: $this->className);

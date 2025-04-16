@@ -14,6 +14,7 @@ class EntityCollectionMappingFilter extends AbstractMappingFilter
         string $className,
         protected EntityManagerInterface $em,
         protected bool $canExistsEntity = false,
+        private ?\Closure $classBuilder = null,
     ) {
         parent::__construct($className);
     }
@@ -44,7 +45,7 @@ class EntityCollectionMappingFilter extends AbstractMappingFilter
         }
         unset($item);
 
-        $objectFilter = new EntityMappingFilter($this->className, $this->em);
+        $objectFilter = new EntityMappingFilter($this->className, $this->em, $this->classBuilder);
         $objectFilter->setMapper($this->getMapper());
 
         $values = array_map(fn ($item) => $objectFilter->filter($item), $value);
