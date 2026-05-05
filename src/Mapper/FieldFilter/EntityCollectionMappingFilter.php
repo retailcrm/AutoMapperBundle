@@ -55,7 +55,7 @@ class EntityCollectionMappingFilter extends AbstractMappingFilter
         $objectFilter = new EntityMappingFilter($this->className, $this->em, $this->classBuilder);
         $objectFilter->setMapper($this->getMapper());
 
-        $values = array_map(fn ($item) => $objectFilter->filter($item), $value);
+        $values = array_map(static fn ($item) => $objectFilter->filter($item), $value);
 
         return new CollectionValue($values, $removedIds, $this->canExistsEntity);
     }

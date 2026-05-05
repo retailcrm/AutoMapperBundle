@@ -6,11 +6,14 @@ namespace Retailcrm\AutoMapperBundle\Tests\Mapper;
 
 use PHPUnit\Framework\TestCase;
 use Retailcrm\AutoMapperBundle\Mapper\Exception\InvalidClassConstructorException;
+use Retailcrm\AutoMapperBundle\Mapper\Exception\SkipFieldMappingException;
 use Retailcrm\AutoMapperBundle\Mapper\FieldAccessor\Closure;
 use Retailcrm\AutoMapperBundle\Mapper\FieldAccessor\Expression;
+use Retailcrm\AutoMapperBundle\Mapper\FieldDeciderInterface;
 use Retailcrm\AutoMapperBundle\Mapper\FieldFilter\ArrayObjectMappingFilter;
 use Retailcrm\AutoMapperBundle\Mapper\FieldFilter\IfNull;
 use Retailcrm\AutoMapperBundle\Mapper\FieldFilter\ObjectMappingFilter;
+use Retailcrm\AutoMapperBundle\Mapper\Map\AbstractMap;
 use Retailcrm\AutoMapperBundle\Mapper\Mapper;
 use Retailcrm\AutoMapperBundle\Tests\Fixtures\DestinationAuthor;
 use Retailcrm\AutoMapperBundle\Tests\Fixtures\DestinationComment;
@@ -91,7 +94,7 @@ class MapperTest extends TestCase
         $destination = new DestinationPost();
         $mapper = new Mapper();
         $mapper->createMap('Retailcrm\AutoMapperBundle\Tests\Fixtures\SourcePost', 'Retailcrm\AutoMapperBundle\Tests\Fixtures\DestinationPost')
-            ->forMember('author', new Closure(function (SourcePost $s) {
+            ->forMember('author', new Closure(static function (SourcePost $s) {
                 return $s->author->name;
             }))
         ;
@@ -372,5 +375,128 @@ class MapperTest extends TestCase
         $mapper = new Mapper();
         $mapper->createMap('Retailcrm\AutoMapperBundle\Tests\Fixtures\SourceAuthor', 'Retailcrm\AutoMapperBundle\Tests\Fixtures\DestinationComplexAuthor');
         $mapper->map($source, 'Retailcrm\AutoMapperBundle\Tests\Fixtures\DestinationComplexAuthor');
+    }
+
+    public function testSkipNonExistsWithFieldMappingDecider(): void
+    {
+        $source = new SourcePost();
+        $source->description = null;
+        $destination = new DestinationPost();
+        $destination->description = 'Foo bar';
+        $mapper = new Mapper();
+        $mapper->registerMap(new class extends AbstractMap {
+            public function __construct()
+            {
+                $this
+                    ->buildDefaultMap()
+                    ->setSkipNonExists(true)
+                ;
+
+                $this->setFieldDecider(new class implements FieldDeciderInterface {
+                    public function shouldMapField(object $source, string $field): bool
+                    {
+                        return 'description' !== $field;
+                    }
+                });
+            }
+
+            public function getSourceType(): string
+            {
+                return SourcePost::class;
+            }
+
+            public function getDestinationType(): string
+            {
+                return DestinationPost::class;
+            }
+        });
+
+        $mapper->map($source, $destination);
+
+        $this->assertEquals('Foo bar', $destination->description);
+    }
+
+    public function testExplicitNullStillMapsWithFieldMappingDecider(): void
+    {
+        $source = new SourcePost();
+        $source->description = null;
+        $destination = new DestinationPost();
+        $destination->description = 'Foo bar';
+        $mapper = new Mapper();
+        $mapper->registerMap(new class extends AbstractMap {
+            public function __construct()
+            {
+                $this
+                    ->buildDefaultMap()
+                    ->setSkipNonExists(true)
+                ;
+
+                $this->setFieldDecider(new class implements FieldDeciderInterface {
+                    public function shouldMapField(object $source, string $field): bool
+                    {
+                        return true;
+                    }
+                });
+            }
+
+            public function getSourceType(): string
+            {
+                return SourcePost::class;
+            }
+
+            public function getDestinationType(): string
+            {
+                return DestinationPost::class;
+            }
+        });
+
+        $mapper->map($source, $destination);
+
+        $this->assertNull($destination->description);
+    }
+
+    public function testClosureCanSkipFieldMappingWithFieldMappingDecider(): void
+    {
+        $source = new SourcePost();
+        $source->description = null;
+        $destination = new DestinationPost();
+        $destination->description = 'Foo bar';
+        $mapper = new Mapper();
+        $mapper->registerMap(new class extends AbstractMap {
+            public function __construct()
+            {
+                $this->setSkipNonExists(true);
+                $this->setFieldDecider(new class implements FieldDeciderInterface {
+                    public function shouldMapField(object $source, string $field): bool
+                    {
+                        return 'description' !== $field;
+                    }
+                });
+
+                $this->forMember('description', new Closure(
+                    static function (SourcePost $source, FieldDeciderInterface $fieldDecider) {
+                        if (!$fieldDecider->shouldMapField($source, 'description')) {
+                            throw new SkipFieldMappingException();
+                        }
+
+                        return $source->description;
+                    }
+                ));
+            }
+
+            public function getSourceType(): string
+            {
+                return SourcePost::class;
+            }
+
+            public function getDestinationType(): string
+            {
+                return DestinationPost::class;
+            }
+        });
+
+        $mapper->map($source, $destination);
+
+        $this->assertEquals('Foo bar', $destination->description);
     }
 }

@@ -7,6 +7,8 @@ namespace Retailcrm\AutoMapperBundle\Mapper\Map;
 use Retailcrm\AutoMapperBundle\Mapper\AfterMapper\AfterMapperInterface;
 use Retailcrm\AutoMapperBundle\Mapper\FieldAccessor\FieldAccessorInterface;
 use Retailcrm\AutoMapperBundle\Mapper\FieldAccessor\Simple;
+use Retailcrm\AutoMapperBundle\Mapper\FieldDeciderAwareInterface;
+use Retailcrm\AutoMapperBundle\Mapper\FieldDeciderInterface;
 use Retailcrm\AutoMapperBundle\Mapper\FieldFilter\FieldFilterInterface;
 
 /**
@@ -14,7 +16,7 @@ use Retailcrm\AutoMapperBundle\Mapper\FieldFilter\FieldFilterInterface;
  *
  * @author Michel Salib <michelsalib@hotmail.com>
  */
-abstract class AbstractMap implements MapInterface
+abstract class AbstractMap implements MapInterface, FieldDeciderAwareInterface
 {
     /** @var FieldAccessorInterface[] */
     protected array $fieldAccessors = [];
@@ -27,15 +29,14 @@ abstract class AbstractMap implements MapInterface
     protected bool $skipNonExists = false;
     /** @var AfterMapperInterface[] */
     protected array $afterMappers = [];
+    protected ?FieldDeciderInterface $fieldDecider = null;
 
     public function buildDefaultMap(): self
     {
         $reflectionClass = new \ReflectionClass($this->getDestinationType());
 
         foreach ($reflectionClass->getProperties() as $property) {
-            $this->fieldAccessors[$property->name] = new Simple(
-                $this->getCorrectPropertyPath($property->name)
-            );
+            $this->fieldAccessors[$property->name] = $this->createSimple($property->name);
         }
 
         return $this;
@@ -46,9 +47,7 @@ abstract class AbstractMap implements MapInterface
      */
     public function route(string $destinationMember, string $sourceMember): self
     {
-        $this->fieldAccessors[$destinationMember] = new Simple(
-            $this->getCorrectPropertyPath($sourceMember)
-        );
+        $this->fieldAccessors[$destinationMember] = $this->createSimple($sourceMember);
         $this->fieldRoutes[$destinationMember] = $sourceMember;
 
         return $this;
@@ -59,6 +58,10 @@ abstract class AbstractMap implements MapInterface
      */
     public function forMember(string $destinationMember, FieldAccessorInterface $fieldMapper): self
     {
+        if ($fieldMapper instanceof FieldDeciderAwareInterface) {
+            $fieldMapper->setFieldDecider($this->fieldDecider);
+        }
+
         $this->fieldAccessors[$destinationMember] = $fieldMapper;
 
         return $this;
@@ -153,6 +156,25 @@ abstract class AbstractMap implements MapInterface
     public function getFieldRoutes(): array
     {
         return $this->fieldRoutes;
+    }
+
+    public function setFieldDecider(?FieldDeciderInterface $fieldDecider): void
+    {
+        $this->fieldDecider = $fieldDecider;
+
+        foreach ($this->fieldAccessors as $fieldAccessor) {
+            if ($fieldAccessor instanceof FieldDeciderAwareInterface) {
+                $fieldAccessor->setFieldDecider($fieldDecider);
+            }
+        }
+    }
+
+    protected function createSimple(string $name): FieldAccessorInterface
+    {
+        return new Simple(
+            $this->getCorrectPropertyPath($name),
+            $this->fieldDecider,
+        );
     }
 
     private function getCorrectPropertyPath(string $name): string

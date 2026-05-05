@@ -7,6 +7,7 @@ namespace Retailcrm\AutoMapperBundle\Mapper;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Retailcrm\AutoMapperBundle\Mapper\Exception\InvalidClassConstructorException;
+use Retailcrm\AutoMapperBundle\Mapper\Exception\SkipFieldMappingException;
 use Retailcrm\AutoMapperBundle\Mapper\FieldAccessor\Simple;
 use Retailcrm\AutoMapperBundle\Mapper\FieldFilter\AbstractMappingFilter;
 use Retailcrm\AutoMapperBundle\Mapper\Map\DefaultMap;
@@ -94,7 +95,12 @@ class Mapper
                 continue;
             }
 
-            $valueResult = $fieldAccessor->getValue($source);
+            try {
+                $valueResult = $fieldAccessor->getValue($source);
+            } catch (SkipFieldMappingException) {
+                continue;
+            }
+
             if ($valueResult instanceof MapperValueInterface) {
                 $value = $valueResult->getValue();
             } else {
