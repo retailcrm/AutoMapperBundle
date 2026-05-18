@@ -31,7 +31,7 @@ class ArrayObjectMappingFilter extends AbstractMappingFilter
         $objectFilter = new ObjectMappingFilter($this->className);
         $objectFilter->setMapper($this->getMapper());
 
-        return array_map(function ($item) use ($objectFilter) {
+        return array_map(static function ($item) use ($objectFilter) {
             return $objectFilter->filter($item);
         }, $value);
     }
