@@ -499,4 +499,206 @@ class MapperTest extends TestCase
 
         $this->assertEquals('Foo bar', $destination->description);
     }
+
+    public function testClosureSkipNonExistsIsDisabledByDefault(): void
+    {
+        $source = new SourcePost();
+        $source->description = null;
+        $destination = new DestinationPost();
+        $destination->description = 'Foo bar';
+        $mapper = new Mapper();
+        $mapper->registerMap(new class extends AbstractMap {
+            public function __construct()
+            {
+                $this->setSkipNonExists(true);
+                $this->setFieldDecider(new class implements FieldDeciderInterface {
+                    public function shouldMapField(object $source, string $field): bool
+                    {
+                        return 'description' !== $field;
+                    }
+                });
+
+                $this->forMember('description', new Closure(
+                    static fn (SourcePost $source): ?string => $source->description
+                ));
+            }
+
+            public function getSourceType(): string
+            {
+                return SourcePost::class;
+            }
+
+            public function getDestinationType(): string
+            {
+                return DestinationPost::class;
+            }
+        });
+
+        $mapper->map($source, $destination);
+
+        $this->assertNull($destination->description);
+    }
+
+    public function testClosureSkipNonExistsUsesDestinationMemberByDefault(): void
+    {
+        $source = new SourcePost();
+        $source->description = null;
+        $destination = new DestinationPost();
+        $destination->description = 'Foo bar';
+        $mapper = new Mapper();
+        $mapper->registerMap(new class extends AbstractMap {
+            public function __construct()
+            {
+                $this->setSkipNonExists(true);
+                $this->setClosureSkipNonExists(true);
+                $this->setFieldDecider(new class implements FieldDeciderInterface {
+                    public function shouldMapField(object $source, string $field): bool
+                    {
+                        return 'description' !== $field;
+                    }
+                });
+
+                $this->forMember('description', new Closure(
+                    static fn () => throw new \RuntimeException('Closure should not be called')
+                ));
+            }
+
+            public function getSourceType(): string
+            {
+                return SourcePost::class;
+            }
+
+            public function getDestinationType(): string
+            {
+                return DestinationPost::class;
+            }
+        });
+
+        $mapper->map($source, $destination);
+
+        $this->assertEquals('Foo bar', $destination->description);
+    }
+
+    public function testClosureSkipNonExistsUsesRouteSourceField(): void
+    {
+        $source = new SourcePost();
+        $source->name = null;
+        $destination = new DestinationPost();
+        $destination->title = 'Foo bar';
+        $mapper = new Mapper();
+        $mapper->registerMap(new class extends AbstractMap {
+            public function __construct()
+            {
+                $this->setSkipNonExists(true);
+                $this->setClosureSkipNonExists(true);
+                $this->setFieldDecider(new class implements FieldDeciderInterface {
+                    public function shouldMapField(object $source, string $field): bool
+                    {
+                        return 'name' !== $field;
+                    }
+                });
+
+                $this->route('title', 'name');
+                $this->forMember('title', new Closure(
+                    static fn () => throw new \RuntimeException('Closure should not be called')
+                ));
+            }
+
+            public function getSourceType(): string
+            {
+                return SourcePost::class;
+            }
+
+            public function getDestinationType(): string
+            {
+                return DestinationPost::class;
+            }
+        });
+
+        $mapper->map($source, $destination);
+
+        $this->assertEquals('Foo bar', $destination->title);
+    }
+
+    public function testClosureSkipNonExistsCanUseExplicitSourceField(): void
+    {
+        $source = new SourcePost();
+        $source->name = null;
+        $destination = new DestinationPost();
+        $destination->title = 'Foo bar';
+        $mapper = new Mapper();
+        $mapper->registerMap(new class extends AbstractMap {
+            public function __construct()
+            {
+                $this->setSkipNonExists(true);
+                $this->setClosureSkipNonExists(true);
+                $this->setFieldDecider(new class implements FieldDeciderInterface {
+                    public function shouldMapField(object $source, string $field): bool
+                    {
+                        return 'name' !== $field;
+                    }
+                });
+
+                $this->forMember('title', new Closure(
+                    static fn () => throw new \RuntimeException('Closure should not be called'),
+                    sourceField: 'name'
+                ));
+            }
+
+            public function getSourceType(): string
+            {
+                return SourcePost::class;
+            }
+
+            public function getDestinationType(): string
+            {
+                return DestinationPost::class;
+            }
+        });
+
+        $mapper->map($source, $destination);
+
+        $this->assertEquals('Foo bar', $destination->title);
+    }
+
+    public function testClosureSkipNonExistsCanBeDisabledForMember(): void
+    {
+        $source = new SourcePost();
+        $source->description = null;
+        $destination = new DestinationPost();
+        $destination->description = 'Foo bar';
+        $mapper = new Mapper();
+        $mapper->registerMap(new class extends AbstractMap {
+            public function __construct()
+            {
+                $this->setSkipNonExists(true);
+                $this->setClosureSkipNonExists(true);
+                $this->setFieldDecider(new class implements FieldDeciderInterface {
+                    public function shouldMapField(object $source, string $field): bool
+                    {
+                        return 'description' !== $field;
+                    }
+                });
+
+                $this->forMember('description', new Closure(
+                    static fn (): string => 'called',
+                    skipNonExists: false
+                ));
+            }
+
+            public function getSourceType(): string
+            {
+                return SourcePost::class;
+            }
+
+            public function getDestinationType(): string
+            {
+                return DestinationPost::class;
+            }
+        });
+
+        $mapper->map($source, $destination);
+
+        $this->assertEquals('called', $destination->description);
+    }
 }

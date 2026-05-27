@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Retailcrm\AutoMapperBundle\Mapper\Map;
 
 use Retailcrm\AutoMapperBundle\Mapper\AfterMapper\AfterMapperInterface;
+use Retailcrm\AutoMapperBundle\Mapper\FieldAccessor\Closure;
 use Retailcrm\AutoMapperBundle\Mapper\FieldAccessor\FieldAccessorInterface;
 use Retailcrm\AutoMapperBundle\Mapper\FieldAccessor\Simple;
 use Retailcrm\AutoMapperBundle\Mapper\FieldDeciderAwareInterface;
@@ -27,6 +28,7 @@ abstract class AbstractMap implements MapInterface, FieldDeciderAwareInterface
     protected bool $overwriteIfSet = true;
     protected bool $skipNull = false;
     protected bool $skipNonExists = false;
+    protected bool $closureSkipNonExists = false;
     /** @var AfterMapperInterface[] */
     protected array $afterMappers = [];
     protected ?FieldDeciderInterface $fieldDecider = null;
@@ -58,6 +60,10 @@ abstract class AbstractMap implements MapInterface, FieldDeciderAwareInterface
      */
     public function forMember(string $destinationMember, FieldAccessorInterface $fieldMapper): self
     {
+        if ($fieldMapper instanceof Closure) {
+            $this->configureClosure($destinationMember, $fieldMapper);
+        }
+
         if ($fieldMapper instanceof FieldDeciderAwareInterface) {
             $fieldMapper->setFieldDecider($this->fieldDecider);
         }
@@ -95,6 +101,7 @@ abstract class AbstractMap implements MapInterface, FieldDeciderAwareInterface
     public function setSkipNonExists(bool $value): self
     {
         $this->skipNonExists = $value;
+        $this->configureClosures();
 
         return $this;
     }
@@ -102,6 +109,14 @@ abstract class AbstractMap implements MapInterface, FieldDeciderAwareInterface
     public function getSkipNonExists(): bool
     {
         return $this->skipNonExists;
+    }
+
+    public function setClosureSkipNonExists(bool $value): self
+    {
+        $this->closureSkipNonExists = $value;
+        $this->configureClosures();
+
+        return $this;
     }
 
     /**
@@ -174,6 +189,24 @@ abstract class AbstractMap implements MapInterface, FieldDeciderAwareInterface
         return new Simple(
             $this->getCorrectPropertyPath($name),
             $this->fieldDecider,
+        );
+    }
+
+    private function configureClosures(): void
+    {
+        foreach ($this->fieldAccessors as $destinationMember => $fieldAccessor) {
+            if ($fieldAccessor instanceof Closure) {
+                $this->configureClosure($destinationMember, $fieldAccessor);
+            }
+        }
+    }
+
+    private function configureClosure(string $destinationMember, Closure $closure): void
+    {
+        $closure->setDestinationMember($destinationMember);
+        $closure->setRoutedSourceField($this->fieldRoutes[$destinationMember] ?? null);
+        $closure->setEffectiveSkipNonExists(
+            $this->skipNonExists && ($closure->getSkipNonExistsOverride() ?? $this->closureSkipNonExists)
         );
     }
 
