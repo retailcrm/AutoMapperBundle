@@ -31,6 +31,7 @@ class DefaultMap extends AbstractMap
     public function route(string $destinationMember, string $sourceMember): self
     {
         $this->fieldAccessors[$destinationMember] = new Simple($this->getCorrectPropertyPath($sourceMember));
+        $this->fieldRoutes[$destinationMember] = $sourceMember;
 
         return $this;
     }
