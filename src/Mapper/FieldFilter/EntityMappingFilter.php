@@ -15,6 +15,7 @@ class EntityMappingFilter extends AbstractMappingFilter
         string $className,
         protected EntityManagerInterface $em,
         private ?\Closure $classBuilder = null,
+        private ?\Closure $filterCallback = null,
     ) {
         parent::__construct($className);
     }
@@ -26,10 +27,13 @@ class EntityMappingFilter extends AbstractMappingFilter
         }
 
         $entity = null;
-        if (is_array($value) && isset($value['id'])) {
+        if (null !== $this->filterCallback) {
+            $entity = ($this->filterCallback)($value);
+        }
+        if (!$entity && is_array($value) && isset($value['id'])) {
             $entity = $this->em->getRepository($this->className)->find($value['id']);
         }
-        if (is_object($value) && property_exists($value, 'id') && $value->id) {
+        if (!$entity && is_object($value) && property_exists($value, 'id') && $value->id) {
             $entity = $this->em->getRepository($this->className)->find($value->id);
         }
 
